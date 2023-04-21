@@ -1,45 +1,47 @@
-import {createConnection} from "typeorm";
-import {Author} from "./entity/Author";
-import {Post} from "./entity/Post";
-import {Category} from "./entity/Category";
+import { Author } from "./entity/Author";
+import { Post } from "./entity/Post";
+import { Category } from "./entity/Category";
+import { DataSource } from "typeorm";
 
-createConnection({
+(async function () {
+  const datasource = new DataSource({
     type: "sqljs",
     location: "test",
     autoSave: true,
-    entities: [
-        Author,
-        Post,
-        Category
-    ],
-    logging: ['query', 'schema'],
-    synchronize: true
-}).then(async connection => {
-    document.write("Writing new post...<br>");
+    entities: [Author, Post, Category],
+    logging: true,
+    synchronize: true,
+  });
 
-    const category1 = new Category();
-    category1.name = "TypeScript";
+  datasource
+    .initialize()
+    .then(async () => {
+      document.write("Writing new post...<br>");
 
-    const category2 = new Category();
-    category2.name = "Programming";
+      const category1 = new Category();
+      category1.name = "TypeScript";
 
-    const author = new Author();
-    author.name = "Person";
+      const category2 = new Category();
+      category2.name = "Programming";
 
-    const post = new Post();
-    post.title = "Control flow based type analysis";
-    post.text = `TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.`;
-    post.categories = [category1, category2];
-    post.author = author;
+      const author = new Author();
+      author.name = "Person";
 
-    const postRepository = connection.getRepository(Post);
-    await postRepository.save(post);
+      const post = new Post();
+      post.title = "Control flow based type analysis";
+      post.text = `TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.`;
+      post.categories = [category1, category2];
+      post.author = author;
 
-    document.write("<br>Post has been save:<br>");
-    document.write("<pre>", JSON.stringify(post, null, 2), "</pre>");
-    console.log("Post has been saved: ", post);
+      const postRepository = datasource.getRepository(Post);
+      await postRepository.save(post);
 
-}).catch(error => {
-    document.write("<b>Error: ", JSON.stringify(error, null, 2), "</b>");
-    console.log("Error: ", error)
-});
+      document.write("<br>Post has been save:<br>");
+      document.write("<pre>", JSON.stringify(post, null, 2), "</pre>");
+      console.log("Post has been saved: ", post);
+    })
+    .catch((error) => {
+      document.write("<b>Error: ", JSON.stringify(error, null, 2), "</b>");
+      console.log("Error: ", error);
+    });
+})();

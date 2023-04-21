@@ -1,18 +1,23 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn} from "typeorm";
-import {Post} from "./Post";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
+import { Post } from "./Post";
 
 @Entity()
 export class Author {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  name: string;
 
-    @Column()
-    name: string;
+  @Column({ nullable: true })
+  birthdate: Date;
 
-    @Column({nullable: true})
-    birthdate: Date;
-
-    @OneToMany(type => Post, post => post.author)
-    posts: Post[];
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 }
